@@ -7,8 +7,10 @@ import com.club.rfid_access.domain.TagDataEvent;
 import com.club.rfid_access.domain.service.DeduplicationService;
 import com.club.rfid_access.domain.service.DefaultAuthorizationCheck;
 import com.club.rfid_access.domain.service.SseBroadcaster;
+import com.club.rfid_access.domain.service.StorageService;
 import com.club.rfid_access.infraestructure.persistence.entity.AccessLogEntity;
 import com.club.rfid_access.infraestructure.persistence.entity.ReaderEntity;
+import com.club.rfid_access.infraestructure.persistence.entity.VehicleEntity;
 import com.club.rfid_access.infraestructure.persistence.repository.AccessLogRepository;
 import com.club.rfid_access.infraestructure.persistence.repository.ReaderRepository;
 import com.club.rfid_access.infraestructure.persistence.repository.RfidTagRepository;
@@ -37,6 +39,7 @@ public class IngestionController {
     private final RfidTagRepository tagRepository;
     private final ReaderRepository readerRepository;
     private final VehicleRepository vehicleRepository;
+    private final StorageService storageService;
 
     public IngestionController(DeduplicationService dedupService,
                                DefaultAuthorizationCheck authCheck,
@@ -44,7 +47,8 @@ public class IngestionController {
                                AccessLogRepository accessLogRepository,
                                RfidTagRepository tagRepository,
                                ReaderRepository readerRepository,
-                               VehicleRepository vehicleRepository) {
+                               VehicleRepository vehicleRepository,
+                               StorageService storageService) {
         this.dedupService = dedupService;
         this.authCheck = authCheck;
         this.sseBroadcaster = sseBroadcaster;
@@ -52,6 +56,7 @@ public class IngestionController {
         this.tagRepository = tagRepository;
         this.readerRepository = readerRepository;
         this.vehicleRepository = vehicleRepository;
+        this.storageService = storageService;
     }
 
     @PostMapping("/tag-read")
@@ -92,26 +97,40 @@ public class IngestionController {
         String vehicleColor = null;
         String vehicleBrand = null;
         String vehicleModel = null;
+        String memberPhotoUrl = null;
+        String vehicleImageUrl = null;
         var tagOpt = tagRepository.findByEpc(epc);
+        VehicleEntity resolvedVehicle = null;
         if (tagOpt.isPresent() && tagOpt.get().isActive()) {
             var tag = tagOpt.get();
+
+            // — Member info + photo URL
             if (tag.getMember() != null) {
-                memberName = tag.getMember().getFirstName() + " " + tag.getMember().getLastName();
+                var member = tag.getMember();
+                memberName = member.getFirstName() + " " + member.getLastName();
+                if (member.getPhotoUrl() != null) {
+                    memberPhotoUrl = storageService.getPresignedUrl(member.getPhotoUrl());
+                }
             }
+
+            // — Vehicle info + image URL
             if (tag.getVehicle() != null) {
-                vehiclePlate = tag.getVehicle().getPlate();
-                vehicleColor = tag.getVehicle().getColor();
-                vehicleBrand = tag.getVehicle().getBrand();
-                vehicleModel = tag.getVehicle().getModel();
+                resolvedVehicle = tag.getVehicle();
             } else if (tag.getMember() != null) {
                 // no direct vehicle on tag — look up member's first vehicle
                 var vehicles = vehicleRepository.findByMemberId(tag.getMember().getId());
                 if (!vehicles.isEmpty()) {
-                    var v = vehicles.get(0);
-                    vehiclePlate = v.getPlate();
-                    vehicleColor = v.getColor();
-                    vehicleBrand = v.getBrand();
-                    vehicleModel = v.getModel();
+                    resolvedVehicle = vehicles.get(0);
+                }
+            }
+
+            if (resolvedVehicle != null) {
+                vehiclePlate = resolvedVehicle.getPlate();
+                vehicleColor = resolvedVehicle.getColor();
+                vehicleBrand = resolvedVehicle.getBrand();
+                vehicleModel = resolvedVehicle.getModel();
+                if (resolvedVehicle.getImageKey() != null) {
+                    vehicleImageUrl = storageService.getPresignedUrl(resolvedVehicle.getImageKey());
                 }
             }
         }
@@ -121,7 +140,7 @@ public class IngestionController {
         logEntry.setReaderId(readerId);
         if (tagOpt.isPresent() && tagOpt.get().isActive()) {
             logEntry.setMember(tagOpt.get().getMember());
-            logEntry.setVehicle(tagOpt.get().getVehicle());
+            logEntry.setVehicle(resolvedVehicle);
         }
         logEntry.setAuthorized(result.decision() == com.club.rfid_access.domain.AuthorizationDecision.GRANTED);
         logEntry.setReason(result.reason());
@@ -144,10 +163,12 @@ public class IngestionController {
                 result.decision().name(),
                 result.reason(),
                 memberName,
+                memberPhotoUrl,
                 vehiclePlate,
                 vehicleColor,
                 vehicleBrand,
-                vehicleModel
+                vehicleModel,
+                vehicleImageUrl
         );
 
         sseBroadcaster.broadcast(sseEvent);

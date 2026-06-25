@@ -12,8 +12,10 @@ public record AccessEventDTO(
     String decision,
     String reason,
     String memberName,
+    String memberPhotoUrl,
     String vehiclePlate,
     String vehicleColor,
     String vehicleBrand,
-    String vehicleModel
+    String vehicleModel,
+    String vehicleImageUrl
 ) {}

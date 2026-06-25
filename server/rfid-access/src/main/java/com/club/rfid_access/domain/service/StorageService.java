@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -37,6 +42,49 @@ public class StorageService {
         }
     }
 
+    /** Upload a file and its 200px-wide thumbnail. Returns the original object key. */
+    public String uploadWithThumbnail(String key, MultipartFile file) {
+        String uploaded = upload(key, file);
+        if (uploaded != null) {
+            try {
+                byte[] thumb = generateThumbnail(file, 200);
+                String thumbKey = key.replaceFirst("(\\.[^.]+)$", "_thumb$1");
+                minioClient.putObject(PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(thumbKey)
+                        .stream(new java.io.ByteArrayInputStream(thumb), thumb.length, -1)
+                        .contentType("image/jpeg")
+                        .build());
+                log.info("Uploaded thumbnail {} to MinIO bucket {}", thumbKey, bucket);
+            } catch (Exception e) {
+                log.warn("Failed to generate/upload thumbnail for {}: {}", key, e.getMessage());
+            }
+        }
+        return uploaded;
+    }
+
+    byte[] generateThumbnail(MultipartFile file, int maxWidth) throws Exception {
+        BufferedImage original = ImageIO.read(file.getInputStream());
+        if (original == null) throw new IllegalArgumentException("Unable to read image");
+
+        int width = original.getWidth();
+        int height = original.getHeight();
+        if (width > maxWidth) {
+            height = (int) (height * ((double) maxWidth / width));
+            width = maxWidth;
+        }
+
+        Image scaled = original.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage thumb = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = thumb.createGraphics();
+        g.drawImage(scaled, 0, 0, null);
+        g.dispose();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(thumb, "jpeg", baos);
+        return baos.toByteArray();
+    }
+
     /** Upload a file and return the object key (e.g. "members/42/photo.jpg") */
     public String upload(String key, MultipartFile file) {
         try {
@@ -53,8 +101,9 @@ public class StorageService {
         }
     }
 
-    /** Get a pre-signed URL valid for 1 hour */
+    /** Get a pre-signed URL valid for 1 hour. Returns null if key is null/empty or MinIO is unavailable. */
     public String getPresignedUrl(String key) {
+        if (key == null || key.isBlank()) return null;
         try {
             return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                     .bucket(bucket)
