@@ -9,6 +9,20 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json()
 }
 
+async function uploadFile<T>(url: string, file: File): Promise<T> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res = await fetch(`${BASE}${url}`, {
+    method: 'POST',
+    body: formData,
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error || `${res.status} ${res.statusText}`)
+  }
+  return res.json()
+}
+
 /** Spring Boot Page<T> wrapper — extracts content array */
 async function requestPage<T>(url: string): Promise<T[]> {
   const page = await request<{ content: T[] }>(url)
@@ -33,6 +47,9 @@ export const api = {
       request<void>(`/members/${id}/deactivate`, { method: 'PATCH' }),
     activate: (id: number) =>
       request<void>(`/members/${id}/activate`, { method: 'PATCH' }),
+    uploadPhoto: (id: number, file: File) =>
+      uploadFile<import('../types/api').Member>(`/members/${id}/photo`, file),
+    getPhotoUrl: (id: number) => `${BASE}/members/${id}/photo`,
   },
   vehicles: {
     list: () => request<import('../types/api').Vehicle[]>('/vehicles'),
@@ -42,6 +59,9 @@ export const api = {
       request<import('../types/api').Vehicle>('/vehicles', { method: 'POST', body: JSON.stringify(data) }),
     linkToMember: (vehicleId: number, memberId: number) =>
       request<import('../types/api').Vehicle>(`/vehicles/${vehicleId}/link/${memberId}`, { method: 'PUT' }),
+    uploadImage: (id: number, file: File) =>
+      uploadFile<import('../types/api').Vehicle>(`/vehicles/${id}/image`, file),
+    getImageUrl: (id: number) => `${BASE}/vehicles/${id}/image`,
   },
   tags: {
     getByEpc: (epc: string) =>

@@ -67,7 +67,18 @@ export default function AccessLogView() {
                 <tr key={l.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-mono text-gray-900">{l.tagEpc}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {l.member ? `${l.member.firstName} ${l.member.lastName}` : '-'}
+                    <div className="flex items-center gap-2">
+                      {l.member ? (
+                        <>
+                          {l.member.photoUrl && (
+                            <img src={`/api/v1/members/${l.member.id}/photo`} alt=""
+                              className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                              onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }} />
+                          )}
+                          <span>{l.member.firstName} {l.member.lastName}</span>
+                        </>
+                      ) : '-'}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={l.authorized ? 'GRANTED' : 'DENIED'} variant="decision" />

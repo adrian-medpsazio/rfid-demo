@@ -28,6 +28,7 @@ export interface Vehicle {
   model: string
   color: string
   member: Member | null
+  imageKey?: string
   createdAt: string
 }
 
@@ -65,8 +66,10 @@ export interface AccessEvent {
   decision: string
   reason: string | null
   memberName: string | null
+  memberPhotoUrl: string | null
   vehiclePlate: string | null
   vehicleColor: string | null
   vehicleBrand: string | null
   vehicleModel: string | null
+  vehicleImageUrl: string | null
 }
