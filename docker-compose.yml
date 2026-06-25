@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rfid-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: rfid_access
+      POSTGRES_USER: rfid_user
+      POSTGRES_PASSWORD: rfid_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
