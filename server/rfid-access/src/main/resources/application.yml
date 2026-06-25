@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: rfid-access
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rfid_access
+    username: rfid_user
+    password: rfid_pass
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+server:
+  port: 8080
+rfid:
+  ingestion:
+    dedup-window-ms: 500
+  sse:
+    heartbeat-ms: 30000
+  storage:
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket: rfid
