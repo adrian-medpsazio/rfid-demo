@@ -11,7 +11,7 @@ interface Props {
 function formatTime(iso: string) {
   try {
     const d = new Date(iso)
-    return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    return d.toLocaleTimeString('es-BO', {hourCycle: "h24"})
   } catch {
     return iso
   }
@@ -75,7 +75,7 @@ export default function AccessFeed({ events }: Props) {
           ? showEmpty('Esperando lecturas del lector RFID...')
           : showEmpty(filter === 'GRANTED' ? 'Sin autorizaciones' : 'Sin denegaciones')
       ) : (
-        <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 scroll-smooth">
+        <div className="space-y-3 max-h-200 overflow-y-auto pr-1 scroll-smooth">
           {filtered.map((e) => (
             <div
               key={e.eventId}

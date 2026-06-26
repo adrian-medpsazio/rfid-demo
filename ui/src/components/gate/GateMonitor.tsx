@@ -23,7 +23,7 @@ export default function GateMonitor() {
 
       <div>
         <h3 className="text-sm font-medium text-gray-700 mb-3">Eventos en Vivo</h3>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 ">
           <AccessFeed events={events} />
         </div>
       </div>

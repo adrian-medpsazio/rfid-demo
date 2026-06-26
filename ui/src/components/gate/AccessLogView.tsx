@@ -51,7 +51,7 @@ export default function AccessLogView() {
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="max-h-[500px] overflow-y-auto">
+        <div className="max-h-200 overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
@@ -75,6 +75,11 @@ export default function AccessLogView() {
                               className="w-6 h-6 rounded-full object-cover border border-gray-200"
                               onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }} />
                           )}
+                          {l.vehicle?.imageKey && (
+                              <img src={`/api/v1/vehicles/${l.vehicle.id}/image`} alt=""
+                                   className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                                   onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }} />
+                          )}
                           <span>{l.member.firstName} {l.member.lastName}</span>
                         </>
                       ) : '-'}
@@ -85,7 +90,7 @@ export default function AccessLogView() {
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">{readerLocation(l.readerId)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {new Date(l.tagTimestamp).toLocaleString('es-AR')}
+                    {new Date(l.tagTimestamp).toLocaleString('es-BO', {hourCycle: "h24"})}
                   </td>
                 </tr>
               ))}
