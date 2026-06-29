@@ -115,7 +115,7 @@ export default function ReaderManager() {
                 <td className="px-4 py-3 text-sm text-gray-500 font-mono">{r.ipAddress}</td>
                 <td className="px-4 py-3 text-sm text-gray-500">{r.location}</td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={String(r.active)} variant="active" />
+                  <StatusBadge status={String(r.active) === "true" ? "Activo" : "Inactivo"} variant="active" />
                 </td>
                 <td className="px-4 py-3 flex gap-2">
                   <button onClick={() => startEdit(r)}

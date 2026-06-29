@@ -72,12 +72,12 @@ export default function AccessLogView() {
                         <>
                           {l.member.photoUrl && (
                             <img src={`/api/v1/members/${l.member.id}/photo`} alt=""
-                              className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                              className="size-14 rounded-lg object-cover border border-gray-200"
                               onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }} />
                           )}
                           {l.vehicle?.imageKey && (
                               <img src={`/api/v1/vehicles/${l.vehicle.id}/image`} alt=""
-                                   className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                                   className="size-14 rounded-lg object-cover border border-gray-200"
                                    onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }} />
                           )}
                           <span>{l.member.firstName} {l.member.lastName}</span>
@@ -86,7 +86,7 @@ export default function AccessLogView() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={l.authorized ? 'GRANTED' : 'DENIED'} variant="decision" />
+                    <StatusBadge status={l.authorized ? 'AUTORIZADO' : 'DENEGADO'} variant="decision" />
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">{readerLocation(l.readerId)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">

@@ -156,7 +156,7 @@ function PhotoRow({ member, uploading, onUpload, onDeactivate, onActivate }: {
       <td className="px-4 py-3 text-sm text-gray-500">{member.email}</td>
       <td className="px-4 py-3 text-sm font-mono text-gray-500">{member.memberCode}</td>
       <td className="px-4 py-3">
-        <StatusBadge status={String(member.active)} variant="active" />
+        <StatusBadge status={String(member.active) === "true" ? "Activo" : "Inactivo"} variant="active" />
       </td>
       <td className="px-4 py-3">
         {member.active ? (

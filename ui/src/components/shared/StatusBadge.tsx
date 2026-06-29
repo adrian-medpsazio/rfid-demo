@@ -4,8 +4,8 @@ interface Props {
 }
 
 const variants = {
-  decision: { GRANTED: 'bg-green-100 text-green-800', DENIED: 'bg-red-100 text-red-800' },
-  active: { true: 'bg-green-100 text-green-800', false: 'bg-gray-100 text-gray-800' },
+  decision: { AUTORIZADO: 'bg-green-200 text-green-800', DENEGADO: 'bg-red-100 text-red-800' },
+  active: { Activo: 'bg-green-200 text-green-800', Inactivo: 'bg-gray-100 text-gray-800' },
   default: 'bg-blue-100 text-blue-800',
 }
 
