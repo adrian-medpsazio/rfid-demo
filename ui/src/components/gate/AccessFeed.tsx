@@ -93,39 +93,44 @@ export default function AccessFeed({ events }: Props) {
               <div className="p-4 pl-5">
                 {/* Top row: badge + timestamp */}
                 <div className="flex items-center justify-between mb-2.5">
-                  <DecisionDot decision={e.decision} />
-                  <span className="text-[11px] text-gray-400 font-mono tracking-tight">
+                    <div className="flex items-center gap-4">
+                        <DecisionDot decision={e.decision} />
+                        <StatusBadge status={e.decision === "GRANTED" ? "AUTORIZADO" : "DENEGADO"} variant="decision" />
+                    </div>
+
+                  <span className="text-sm text-gray-400 font-mono tracking-tight">
                     {formatTime(e.timestamp)}
                   </span>
                 </div>
 
                 {/* Member photo + name row */}
                 <div className="flex items-start justify-center gap-3 mb-2">
-                  {e.memberPhotoUrl ? (
-                    <img
-                      src={e.memberPhotoUrl}
-                      alt=""
-                      className="size-20 rounded-full object-cover ring-2 ring-gray-50 flex-shrink-0"
-                      onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }}
-                    />
-                  ) : e.memberName ? (
-                    <div className="size-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 ring-2 ring-gray-50">
-                      <span className="text-sm font-medium text-gray-400">
-                        {e.memberName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  ) : null}
-
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
+                    <p className="text-md font-bold text-gray-900 truncate">
                       {e.memberName || 'Desconocido'}
                     </p>
 
                     {e.vehiclePlate && (
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-sm text-gray-500 truncate">
                         {[e.vehicleBrand, e.vehicleModel, e.vehiclePlate, e.vehicleColor].filter(Boolean).join(' · ')}
                       </p>
                     )}
+
+                      <div className="flex mt-3">
+                    {e.memberPhotoUrl ? (
+                        <img
+                            src={e.memberPhotoUrl}
+                            alt=""
+                            className="size-56 rounded-lg object-cover ring-2 ring-gray-50 shrink-0"
+                            onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }}
+                        />
+                    ) : e.memberName ? (
+                        <div className="size-56 rounded-lg bg-gray-200 flex items-center justify-center shrink-0 ring-2 ring-gray-50">
+                      <span className="text-sm font-medium text-gray-400">
+                        {e.memberName.charAt(0).toUpperCase()}
+                      </span>
+                        </div>
+                    ) : null}
 
                     {/* Vehicle thumbnail */}
                     {e.vehicleImageUrl && (
@@ -133,25 +138,24 @@ export default function AccessFeed({ events }: Props) {
                           <img
                               src={e.vehicleImageUrl}
                               alt=""
-                              className="h-52 w-auto rounded-lg object-cover border border-gray-100"
+                              className="h-56 w-auto rounded-lg object-cover border border-gray-100"
                               onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }}
                           />
                         </div>
                     )}
+                      </div>
                   </div>
-
-                  <StatusBadge status={e.decision} variant="decision" />
                 </div>
 
 
 
                 {/* EPC + reader metadata */}
-                <div className="flex items-center gap-1.5 text-[11px] text-gray-400 truncate">
+                <div className="flex items-center gap-1.5 text-sm text-gray-400 truncate">
                   <span className="font-mono">{e.epc}</span>
                   <span>·</span>
                   <span>{e.readerId}</span>
                   <span>·</span>
-                  <span>{e.antennaName || `Antena ${e.antenna}`}</span>
+                  <span className="text-gray-700 font-semibold">{e.antennaName || `Antena ${e.antenna}`}</span>
                 </div>
               </div>
             </div>

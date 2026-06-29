@@ -127,11 +127,11 @@ function PhotoRow({ member, uploading, onUpload, onDeactivate, onActivate }: {
             <img
               src={api.members.getPhotoUrl(member.id)}
               alt="Foto"
-              className="w-10 h-10 rounded-full object-cover border border-gray-200"
+              className="size-14 rounded-lg object-cover border border-gray-200"
               onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+            <div className="size-14 rounded-lg bg-gray-200 flex items-center justify-center text-xs text-gray-500 text-center">
               Sin foto
             </div>
           )}

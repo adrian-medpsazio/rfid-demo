@@ -123,11 +123,11 @@ function ImageRow({ vehicle, uploading, onUpload, linkVehicleId, members, onLink
             <img
               src={api.vehicles.getImageUrl(vehicle.id)}
               alt="Vehículo"
-              className="w-10 h-10 rounded object-cover border border-gray-200"
+              className="size-14 rounded object-cover border border-gray-200"
               onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           ) : (
-            <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+            <div className="size-14 rounded bg-gray-100 flex items-center justify-center text-xs text-gray-400 text-center">
               Sin img
             </div>
           )}

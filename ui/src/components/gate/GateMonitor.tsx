@@ -9,7 +9,7 @@ export default function GateMonitor() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Monitor de Puerta</h2>
-        <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+        <span className={`inline-flex items-center gap-1.5 text-sm animate-pulse ${
           connected ? 'text-green-600' : 'text-red-600'
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${
